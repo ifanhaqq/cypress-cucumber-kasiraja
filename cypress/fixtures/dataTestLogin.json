@@ -1,0 +1,9 @@
+{
+    "email" : "toshoda@gmail.com",
+    "password" : "12345678",
+    "url" : "https://kasirdemo.belajarqa.com",
+    "invalidEmail" : "false@gmail.com",
+    "invalidPassword" : "87654321",
+    "invalidFormatEmail" : "subur@gmail",
+    "namaToko" : "Toko Subur"
+}
