@@ -14,6 +14,9 @@ Also the feature that i was testing in this tutorial are the login feature and t
 <br>
 1. Installation
 
+   ```
+   npm init -y
+   ```
    
    ```
    npm install cypress
@@ -25,7 +28,7 @@ Also the feature that i was testing in this tutorial are the login feature and t
    npm install @badeball/cypress-cucumber-preprocessor
    ```
 
-2. Make the directories
+1. Make the directories
    
 
 
@@ -39,7 +42,7 @@ Also the feature that i was testing in this tutorial are the login feature and t
 	|    └--- support/
 	```
 
- 3. Create a config file cypress.config.js and paste the configuration below
+ 2. Create a config file cypress.config.js and paste the configuration below
 
     ```
     const { defineConfig } = require("cypress");
@@ -72,7 +75,7 @@ Also the feature that i was testing in this tutorial are the login feature and t
     ```
 
  
- 4. Create login.feature file inside login folder using Gherkin Syntax
+ 3. Create login.feature file inside login folder using Gherkin Syntax
 
     ```
     Feature: Kasiraja Login
@@ -90,7 +93,7 @@ Also the feature that i was testing in this tutorial are the login feature and t
         Then I should see the wrong alert
     ```
 
-5. Also create the addProduct.feature file inside add_product folder
+4. Also create the addProduct.feature file inside add_product folder
 
    ```
    Feature: Kasiraja Add Product
@@ -122,27 +125,26 @@ Also the feature that i was testing in this tutorial are the login feature and t
 
    ```
 
-   6. Add 2 files inside the support folder
+6. Add 2 files inside the support folder
 
-      e2e.js
-      ```
-      import './commands.js'
-      ```
+   e2e.js
+   ```
+   import './commands.js'
+   ```
+   commands.js
+   ```
+   Cypress.Commands.add('login', (email, password) => { 
+       cy.visit('https://kasirdemo.belajarqa.com')
 
-      commands.js
-      ```
-      Cypress.Commands.add('login', (email, password) => { 
-	    cy.visit('https://kasirdemo.belajarqa.com')
-	
-	    cy.get("#email").type("toshoda@gmail.com")
-	
-	    cy.get("#password").type("12345678")
-	    
-	    cy.get(".chakra-button").click() //click login
-      })
-      ```
+       cy.get("#email").type("toshoda@gmail.com")
 
-   7. Inside fixtures folder, create dataTestLogin.json file
+       cy.get("#password").type("12345678")
+    
+       cy.get(".chakra-button").click() //click login
+    })
+    ```
+
+8. Inside fixtures folder, create dataTestLogin.json file
 
       dataTestLogin.json
       ```
@@ -157,7 +159,7 @@ Also the feature that i was testing in this tutorial are the login feature and t
       })
       ```
 
-   8. Now let's write our step definitions code, first we are working with the login feature first, create login.js file inside the login folder and then import all the necessary library
+9. Now let's write our step definitions code, first we are working with the login feature first, create login.js file inside the login folder and then import all the necessary library
   
       login.js
       ```
@@ -165,7 +167,7 @@ Also the feature that i was testing in this tutorial are the login feature and t
       const dataTestLogin = require("../../fixtures/dataTestLogin.json")
       ```
 
-   9. Then we are going to write our definitions on the previous Gherkin Syntax that we wrote earlier.
+10. Then we are going to write our definitions on the previous Gherkin Syntax that we wrote earlier.
 
        login.js
       ```
@@ -203,6 +205,87 @@ Also the feature that i was testing in this tutorial are the login feature and t
 	    cy.get(".chakra-alert").should('have.text','Kredensial yang Anda berikan salah')
       })
       ```
+11. Next let's head on working with step definitions of the add product feature, create addProduct.js file inside add_product folder
+
+Import all the necessary library
+```
+import 'cypress-xpath'
+const { Given, When, And, Then } = require("@badeball/cypress-cucumber-preprocessor")
+```
+addProduct.js
+```
+Given("I login to the website", () => {
+    cy.login()
+})
+
+When("I click the product menu", () => {
+    cy.get('[href="/products"]').click()
+})
+
+When("I click add product", () => {
+    cy.get('.chakra-button').click()
+})
+
+When("I fill all the form data with correct data", () => {
+    cy.get('#nama').type('Logitech M330')
+        
+    cy.get('#deskripsi').type('Wireless silent click mouse')
+    cy.xpath("//input[@id='harga beli']").type('30000')
+    cy.xpath("//input[@id='harga jual']").type('100000')
+    cy.get('#stok').clear()
+    cy.get('#stok').type('40')
+
+    cy.get('#kategori').click() // kategori
+    cy.get(':nth-child(1) > .css-u3dlpe').click({ force: true }) //kategori
+})
+
+When("I click the save button", () => {
+    cy.get('.chakra-button').click()
+})
+
+When("I fill all the form with the same code of product that are existed", () => {
+    cy.get('#kode').type('BR572929')
+    cy.get('#nama').type('Logitech M330')
+        
+    cy.get('#deskripsi').type('Wireless silent click mouse')
+    cy.xpath("//input[@id='harga beli']").type('30000')
+    cy.xpath("//input[@id='harga jual']").type('100000')
+    cy.get('#stok').clear()
+    cy.get('#stok').type('40')
+
+    cy.get('#kategori').click() // kategori
+    cy.get(':nth-child(1) > .css-u3dlpe').click({ force: true }) //kategori
+})
+
+When("I fill all the form but name's column", () => {
+    cy.get('#deskripsi').type('Wireless silent click mouse')
+    cy.xpath("//input[@id='harga beli']").type('30000')
+    cy.xpath("//input[@id='harga jual']").type('100000')
+    cy.get('#stok').clear()
+    cy.get('#stok').type('40')
+
+    cy.get('#kategori').click() // kategori
+    cy.get(':nth-child(1) > .css-u3dlpe').click({ force: true }) //kategori
+})
+
+Then("I should see the success alert", () => {
+    cy.get('#chakra-toast-manager-top-right').should('be.visible')
+})
+
+Then("I should see the error alert", () => {
+    cy.get('.chakra-alert').should('have.text', '"name" is not allowed to be empty')
+})
+
+Then("I should see the error alert 'Cannot using the same code of product'", () => {
+    cy.get('.chakra-alert').should('have.text', 'You can not have same code for each product!')
+})
+```
+
+11. Last, let's just try to run our program, type in the termninal.
+
+```
+npx cypress open
+```
       
 
    
